@@ -32,7 +32,7 @@ public class CounterListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e) {
         final Player player = e.getPlayer();
         if (!this.plugin.getCounter().isInConfig(player)) {
-            this.plugin.getCounter().setLives(player, 3);
+            this.plugin.getCounter().setLives(player, plugin.getCfg().getInt("DEFAULT-LIVES"));
             this.plugin.getLogger().log(Level.INFO, plugin.getLang().getString("CONSOLE-LOG-ON-JOIN").replace("{player}", player.getName()));
         }
 
@@ -92,7 +92,7 @@ public class CounterListener implements Listener {
         final Player player = e.getPlayer();
         player.setGameMode(GameMode.SPECTATOR);
         (new BukkitRunnable() {
-            int time = 4;
+            int time = (plugin.getCfg().getInt("RESPAWN-TIME") + 1);
 
             public void run() {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 30 * 20, 255));
@@ -102,7 +102,7 @@ public class CounterListener implements Listener {
                         , 1, 20, 1);
                 if (this.time == 0) {
                     player.removePotionEffect(PotionEffectType.BLINDNESS);
-                    player.setGameMode(GameMode.SURVIVAL);
+                    player.setGameMode(GameMode.valueOf(plugin.getCfg().getString("RESPAWN-GAMEMODE").toUpperCase()));
                     player.teleport(player.getBedSpawnLocation());
                     this.cancel();
                 }

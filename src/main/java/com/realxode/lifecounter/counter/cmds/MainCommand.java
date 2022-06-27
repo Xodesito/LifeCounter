@@ -107,10 +107,10 @@ public class MainCommand implements CommandExecutor {
                     counter = new Counter(this.plugin);
                     counter.addLives(target, value);
                     sender.sendMessage(plugin.getLang().getString("LIFES-ADDED")
-                            .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(target)))
+                            .replace("{lifes}", String.valueOf(value))
                             .replace("{player}", target.getName()));
                     target.sendMessage(plugin.getLang().getString("ADMIN-ADDED")
-                            .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(target))));
+                            .replace("{lifes}", String.valueOf(value)));
                     if (counter.getLives(target.getPlayer()) <= 0) {
                         target.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
                     }
@@ -144,16 +144,16 @@ public class MainCommand implements CommandExecutor {
                     counter = new Counter(this.plugin);
                     counter.addLives(target, value);
                     sender.sendMessage(plugin.getLang().getString("LIFES-REMOVED")
-                            .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(target)))
+                            .replace("{lifes}", String.valueOf(value))
                             .replace("{player}", target.getName()));
                     target.sendMessage(plugin.getLang().getString("ADMIN-REMOVED")
-                            .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(target))));
+                            .replace("{lifes}", String.valueOf(value)));
                     if (counter.getLives(target.getPlayer()) <= 0) {
                         target.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
                     }
                     break;
                 case "reload":
-                    this.plugin.getCfg().reload();
+                    this.plugin.getStorage().reload();
                     this.plugin.getHelp().reload();
                     sender.sendMessage(translate("&eThe plugin has been successfully reloaded!"));
                     plugin.getLogger().log(Level.INFO, "The plugin has been successfully reloaded! You are using version: " + plugin.getVersion());

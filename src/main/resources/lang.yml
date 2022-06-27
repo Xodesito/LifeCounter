@@ -1,3 +1,5 @@
+# This is lang file
+# Use <#center> if u want to center text
 KICK-MESSAGE: '&4&lBANNED!\n\n&cYou have no lives left! You cant go in anymore.'
 CONSOLE-LOG-ON-JOIN: 'Player {player} has not been found in storage! He has been registered with a value of 3 lives.'
 ACTION-BAR: '&cYou have a total of &4&l{lifes} &clives left'
@@ -20,3 +22,5 @@ NO-ARGS-ADD: '&cYou must specify a player and a value! Example: /lifecounter add
 LIFES-ADDED: '&aA value of {lifes} lives has been added to {player}.'
 ADMIN-ADDED: '&aAn admin added {lifes} lives to you.'
 NO-ARGS-REMOVE: '&cYou must specify a player and a value! Example: /lifecounter remove <player> <value>'
+LIFES-REMOVED: '&aA value of {lifes} lives has been removed from {player}.'
+ADMIN-REMOVED: '&aAn admin removed {lifes} lives from you.'
