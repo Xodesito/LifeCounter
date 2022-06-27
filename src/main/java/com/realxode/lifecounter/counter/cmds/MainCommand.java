@@ -9,7 +9,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Iterator;
+import java.util.logging.Level;
 
 import static com.realxode.api.chat.ChatUtil.translate;
 
@@ -22,7 +22,7 @@ public class MainCommand implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("lifecounter.use")) {
-            sender.sendMessage(translate("&cYou do not have sufficient permissions to use this command!"));
+            sender.sendMessage(plugin.getLang().getString("NO-PERMS"));
             return true;
         } else if (args.length == 0) {
 
@@ -43,18 +43,18 @@ public class MainCommand implements CommandExecutor {
             switch (args[0].toLowerCase()) {
                 case "set":
                     if (args.length == 1) {
-                        sender.sendMessage(translate("&cYou must specify a player and a value! Example: /" + label + " set " + sender.getName() + " 3"));
+                        sender.sendMessage(plugin.getLang().getString("NO-ARGS-SET"));
                         return true;
                     }
 
                     target = Bukkit.getPlayer(args[1]);
                     if (target == null) {
-                        sender.sendMessage(translate("&cThis player does not exist or is not online."));
+                        sender.sendMessage(plugin.getLang().getString("PLAYER-NO-EXISTS"));
                         return true;
                     }
 
                     if (args.length == 2) {
-                        sender.sendMessage(translate("&cYou must specify a value!"));
+                        sender.sendMessage(plugin.getLang().getString("SPECIFY-VALUE"));
                         return true;
                     }
 
@@ -63,32 +63,35 @@ public class MainCommand implements CommandExecutor {
                     try {
                         value = Integer.parseInt(args[2]);
                     } catch (NumberFormatException var14) {
-                        sender.sendMessage(translate("&cThe specified value does not match, verify that it is a valid number."));
+                        sender.sendMessage(plugin.getLang().getString("VALUE-ERROR"));
                         break;
                     }
 
                     counter = new Counter(this.plugin);
                     counter.setLives(target, value);
-                    sender.sendMessage(translate("&aA value of " + value + " lives has been set to " + target.getName() + "."));
-                    target.sendMessage(translate("&6Un administrador te ha establecido el número de vidas en " + value + "."));
+                    sender.sendMessage(plugin.getLang().getString("LIFES-SET")
+                            .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(target)))
+                            .replace("{player}", target.getName()));
+                    target.sendMessage(plugin.getLang().getString("ADMIN-SET")
+                            .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(target))));
                     if (counter.getLives(target.getPlayer()) <= 0) {
-                        target.kickPlayer(translate("&4&l¡VETADO!\n \n&c¡No te quedan vidas! No puedes entrar nunca más."));
+                        target.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
                     }
                     break;
                 case "add":
                     if (args.length == 1) {
-                        sender.sendMessage(translate("&cYou must specify a player and a value! Example: /" + label + " add " + sender.getName() + " 3"));
+                        sender.sendMessage(plugin.getLang().getString("NO-ARGS-ADD"));
                         return true;
                     }
 
                     target = Bukkit.getPlayer(args[1]);
                     if (target == null) {
-                        sender.sendMessage(translate("&cThis player does not exist or is not online."));
+                        sender.sendMessage(plugin.getLang().getString("PLAYER-NO-EXISTS"));
                         return true;
                     }
 
                     if (args.length == 2) {
-                        sender.sendMessage(translate("&cYou must specify a value!"));
+                        sender.sendMessage(plugin.getLang().getString("SPECIFY-VALUE"));
                         return true;
                     }
 
@@ -97,32 +100,35 @@ public class MainCommand implements CommandExecutor {
                     try {
                         value = Integer.parseInt(args[2]);
                     } catch (NumberFormatException var13) {
-                        sender.sendMessage(translate("&cThe specified value does not match, verify that it is a valid number."));
+                        sender.sendMessage(plugin.getLang().getString("VALUE-ERROR"));
                         break;
                     }
 
                     counter = new Counter(this.plugin);
                     counter.addLives(target, value);
-                    sender.sendMessage(translate("&aA value of " + value + " lives has been added to " + target.getName() + "."));
-                    target.sendMessage(translate("&6Un administrador te ha agregado " + value + " vidas &7(total: " + counter.getLives(target) + ")."));
+                    sender.sendMessage(plugin.getLang().getString("LIFES-ADDED")
+                            .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(target)))
+                            .replace("{player}", target.getName()));
+                    target.sendMessage(plugin.getLang().getString("ADMIN-ADDED")
+                            .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(target))));
                     if (counter.getLives(target.getPlayer()) <= 0) {
-                        target.kickPlayer(translate("&4&l¡VETADO!\n \n&c¡No te quedan vidas! No puedes entrar nunca más."));
+                        target.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
                     }
                     break;
                 case "remove":
                     if (args.length == 1) {
-                        sender.sendMessage(translate("&cYou must specify a player and a value! Example: /" + label + " remove " + sender.getName() + " 3"));
+                        sender.sendMessage(plugin.getLang().getString("NO-ARGS-REMOVE"));
                         return true;
                     }
 
                     target = Bukkit.getPlayer(args[1]);
                     if (target == null) {
-                        sender.sendMessage(translate("&cThis player does not exist or is not online."));
+                        sender.sendMessage(plugin.getLang().getString("PLAYER-NO-EXISTS"));
                         return true;
                     }
 
                     if (args.length == 2) {
-                        sender.sendMessage(translate("&cYou must specify a value!"));
+                        sender.sendMessage(plugin.getLang().getString("SPECIFY-VALUE"));
                         return true;
                     }
 
@@ -131,29 +137,37 @@ public class MainCommand implements CommandExecutor {
                     try {
                         value = Integer.parseInt(args[2]);
                     } catch (NumberFormatException var12) {
-                        sender.sendMessage(translate("&cThe specified value does not match, verify that it is a valid number."));
+                        sender.sendMessage(plugin.getLang().getString("VALUE-ERROR"));
                         break;
                     }
 
                     counter = new Counter(this.plugin);
                     counter.addLives(target, value);
-                    sender.sendMessage(translate("&aA value of " + value + " lives has been removed to " + target.getName() + "."));
-                    target.sendMessage(translate("&6Un administrador te ha removido " + value + " vidas."));
+                    sender.sendMessage(plugin.getLang().getString("LIFES-REMOVED")
+                            .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(target)))
+                            .replace("{player}", target.getName()));
+                    target.sendMessage(plugin.getLang().getString("ADMIN-REMOVED")
+                            .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(target))));
                     if (counter.getLives(target.getPlayer()) <= 0) {
-                        target.kickPlayer(translate("&4&l¡VETADO!\n \n&c¡No te quedan vidas! No puedes entrar nunca más."));
+                        target.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
                     }
                     break;
                 case "reload":
                     this.plugin.getCfg().reload();
                     this.plugin.getHelp().reload();
                     sender.sendMessage(translate("&eThe plugin has been successfully reloaded!"));
+                    plugin.getLogger().log(Level.INFO, "The plugin has been successfully reloaded! You are using version: " + plugin.getVersion());
+                    plugin.getLogger().log(Level.INFO, "This plugin was developed by Xodesito. " +
+                            "If you need support REGARDING THE PLUGIN, join the Discord and feel free to ask!");
+                    plugin.getLogger().log(Level.INFO, "Support Discord: https://discord.gg/BD5TdFsgXa");
                     break;
                 default:
-                    Iterator var10 = this.plugin.getHelp().getStringList("HELP-MESSAGE").iterator();
-
-                    while (var10.hasNext()) {
-                        String string = (String) var10.next();
-                        Chat.sendCenteredMessageV2(sender, translate(string));
+                    for (String string : this.plugin.getHelp().getStringList("HELP-MESSAGE")) {
+                        if (string.contains("<#center>")) {
+                            Chat.sendCenteredMessageV2(sender, translate(string.replace("<#center>", "")));
+                        } else {
+                            sender.sendMessage(translate(string));
+                        }
                     }
             }
 

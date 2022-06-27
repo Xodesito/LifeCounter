@@ -33,15 +33,16 @@ public class CounterListener implements Listener {
         final Player player = e.getPlayer();
         if (!this.plugin.getCounter().isInConfig(player)) {
             this.plugin.getCounter().setLives(player, 3);
-            this.plugin.getLogger().log(Level.INFO, "Player " + player.getName() + " has not been found in storage! He has been registered with a value of 3 lives.");
+            this.plugin.getLogger().log(Level.INFO, plugin.getLang().getString("CONSOLE-LOG-ON-JOIN").replace("{player}", player.getName()));
         }
 
         if (this.plugin.getCounter().getLives(player) == 0) {
-            player.kickPlayer(translate("&4&l¡VETADO!\n \n&c¡No te quedan vidas! No puedes entrar nunca más."));
+            player.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
         } else {
             (new BukkitRunnable() {
                 public void run() {
-                    String message = translate("&cTe quedan un total de &4&l" + plugin.getCounter().getLives(player) + "&c vidas");
+                    String message = plugin.getLang().getString("ACTION-BAR").replace("{lifes}",
+                            String.valueOf(plugin.getCounter().getLives(player)));
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
                 }
             }).runTaskTimer(plugin, 20L, 20L);
@@ -60,17 +61,28 @@ public class CounterListener implements Listener {
         }).runTaskLater(plugin, 2L);
         if (plugin.getCounter().isInConfig(player)) {
             if (plugin.getCounter().getLives(player) - 1 == 0) {
-                player.kickPlayer(translate("&4&l¡VETADO!\n \n&c¡No te quedan vidas! No puedes entrar nunca más."));
+                player.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
                 plugin.getCounter().setLives(player, 0);
             } else {
                 plugin.getCounter().setLives(player, plugin.getCounter().getLives(player) - 1);
-                player.sendMessage(" ");
-                sendCenteredMessageV2(player, translate("&c&l¡HAS MUERTO!"));
-                sendCenteredMessageV2(player, translate("&fPerdiste una vida, te quedan solo &7" +
-                        plugin.getCounter().getLives(player) + " &fvidas!"));
-                player.sendMessage(" ");
-                e.setDeathMessage(centerMessage("&c¡&4" + player.getName() + "&c ha muerto! Le quedan &4&l" +
-                        plugin.getCounter().getLives(player) + " &cvidas."));
+                for (String string : plugin.getLang().getStringList("DEATH-MESSAGE")) {
+                    if (string.contains("<#center>")) {
+                        sendCenteredMessageV2(player, string
+                                .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(player)))
+                                .replace("<#center>", ""));
+                    } else {
+                        player.sendMessage(translate(string.replace("{lifes}", String.valueOf(plugin.getCounter().getLives(player)))));
+                    }
+                }
+                String broadcastMessage = plugin.getLang().getString("BROADCAST-DEATH-MESSAGE")
+                        .replace("{player}", player.getName())
+                        .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(player)));
+                if (broadcastMessage.contains("<#center>")) {
+                    e.setDeathMessage(centerMessage(broadcastMessage
+                            .replace("<#center>", "")));
+                } else {
+                    e.setDeathMessage(broadcastMessage);
+                }
             }
         }
     }
@@ -79,14 +91,14 @@ public class CounterListener implements Listener {
     public void onRespawn(PlayerRespawnEvent e) {
         final Player player = e.getPlayer();
         player.setGameMode(GameMode.SPECTATOR);
-        player.sendTitle(translate("&c&l¡HAS MUERTO!"), translate("&cReaparecerás en &43 &csegundos!"), 1, 20, 1);
         (new BukkitRunnable() {
-            int time = 3;
+            int time = 4;
 
             public void run() {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 30 * 20, 255));
                 --this.time;
-                player.sendTitle(translate("&c&l¡HAS MUERTO!"), translate("&cReaparecerás en &4" + this.time + " &csegundos!")
+                player.sendTitle(plugin.getLang().getString("DEATH-TITLE").replace("{time}", String.valueOf(time))
+                        , plugin.getLang().getString("DEATH-SUBTITLE").replace("{time}", String.valueOf(time))
                         , 1, 20, 1);
                 if (this.time == 0) {
                     player.removePotionEffect(PotionEffectType.BLINDNESS);
@@ -96,6 +108,6 @@ public class CounterListener implements Listener {
                 }
 
             }
-        }).runTaskTimer(this.plugin, 20L, 20L);
+        }).runTaskTimer(this.plugin, 1L, 20L);
     }
 }
