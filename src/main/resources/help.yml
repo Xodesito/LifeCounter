@@ -1,0 +1,10 @@
+HELP-MESSAGE:
+  - '<#center>&8&m-----------------------------------------'
+  - ''
+  - '<#center>&f&lLIFE&b&lCOUNTER &8| &7Help'
+  - '<#center>&7set <player> <value>'
+  - '<#center>&7add <player> <value>'
+  - '<#center>&7remove <player> <value>'
+  - '<#center>&7reload'
+  - ''
+  - '<#center>&8&m-----------------------------------------'

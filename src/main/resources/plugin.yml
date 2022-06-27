@@ -1,0 +1,14 @@
+name: LifeCounter
+version: '${project.version}'
+main: com.realxode.lifecounter.LifeCounter
+api-version: 1.18
+authors: [ RealXode ]
+description: Count your lifes
+commands:
+  lifecounter:
+    description: LifeCounter main command
+    aliases:
+      - lifec
+      - lc
+      - life
+      - vida
