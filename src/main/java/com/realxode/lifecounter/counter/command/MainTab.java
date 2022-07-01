@@ -1,4 +1,4 @@
-package com.realxode.lifecounter.counter.cmds;
+package com.realxode.lifecounter.counter.command;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;

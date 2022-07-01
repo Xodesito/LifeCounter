@@ -2,9 +2,9 @@ package com.realxode.lifecounter;
 
 import com.realxode.api.file.FileConfig;
 import com.realxode.lifecounter.counter.Counter;
-import com.realxode.lifecounter.counter.cmds.MainCommand;
-import com.realxode.lifecounter.counter.cmds.MainTab;
-import com.realxode.lifecounter.counter.events.CounterListener;
+import com.realxode.lifecounter.counter.command.MainCommand;
+import com.realxode.lifecounter.counter.command.MainTab;
+import com.realxode.lifecounter.counter.event.CounterListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;

@@ -1,8 +1,9 @@
-package com.realxode.lifecounter.counter.events;
+package com.realxode.lifecounter.counter.event;
 
 import com.realxode.lifecounter.LifeCounter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.entity.Player;
@@ -58,7 +59,7 @@ public class CounterListener implements Listener {
             public void run() {
                 player.spigot().respawn();
             }
-        }).runTaskLater(plugin, 2L);
+        }).runTaskLater(plugin, 1L);
         if (plugin.getCounter().isInConfig(player)) {
             if (plugin.getCounter().getLives(player) - 1 == 0) {
                 player.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
@@ -102,7 +103,13 @@ public class CounterListener implements Listener {
                         , 1, 20, 1);
                 if (this.time == 0) {
                     player.removePotionEffect(PotionEffectType.BLINDNESS);
-                    player.setGameMode(GameMode.valueOf(plugin.getCfg().getString("RESPAWN-GAMEMODE").toUpperCase()));
+                    try {
+                        player.setGameMode(GameMode.valueOf(plugin.getCfg().getString("RESPAWN-GAMEMODE").toUpperCase()));
+                    } catch (IllegalArgumentException ex) {
+                        player.sendMessage(translate("An error has occurred, contact an administrator."));
+                        Bukkit.getConsoleSender().sendMessage(translate("[LifeCounter] Illegal argument, is \"" + plugin.getCfg().getString("RESPAWN-GAMEMODE") + "\" spelled correctly?"));
+                        ex.printStackTrace();
+                    }
                     player.teleport(player.getBedSpawnLocation());
                     this.cancel();
                 }

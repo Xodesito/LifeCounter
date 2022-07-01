@@ -1,4 +1,4 @@
-package com.realxode.lifecounter.counter.cmds;
+package com.realxode.lifecounter.counter.command;
 
 import com.realxode.api.chat.ChatUtil.Chat;
 import com.realxode.lifecounter.LifeCounter;
@@ -154,6 +154,8 @@ public class MainCommand implements CommandExecutor {
                     break;
                 case "reload":
                     this.plugin.getStorage().reload();
+                    plugin.getCfg().reload();
+                    plugin.getLang().reload();
                     this.plugin.getHelp().reload();
                     sender.sendMessage(translate("&eThe plugin has been successfully reloaded!"));
                     plugin.getLogger().log(Level.INFO, "The plugin has been successfully reloaded! You are using version: " + plugin.getVersion());
