@@ -71,4 +71,5 @@ public final class LifeCounter extends JavaPlugin {
     public FileConfig getCfg() {
         return cfg;
     }
+
 }

@@ -74,8 +74,11 @@ public class MainCommand implements CommandExecutor {
                             .replace("{player}", target.getName()));
                     target.sendMessage(plugin.getLang().getString("ADMIN-SET")
                             .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(target))));
-                    if (counter.getLives(target.getPlayer()) <= 0) {
-                        target.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
+
+                    if (plugin.getCfg().getBoolean("CUSTOM-BAN-ON-FINAL-DEATH")) {
+                        if (counter.getLives(target.getPlayer()) <= 0) {
+                            target.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
+                        }
                     }
                     break;
                 case "add":
@@ -111,8 +114,11 @@ public class MainCommand implements CommandExecutor {
                             .replace("{player}", target.getName()));
                     target.sendMessage(plugin.getLang().getString("ADMIN-ADDED")
                             .replace("{lifes}", String.valueOf(value)));
-                    if (counter.getLives(target.getPlayer()) <= 0) {
-                        target.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
+
+                    if (plugin.getCfg().getBoolean("CUSTOM-BAN-ON-FINAL-DEATH")) {
+                        if (counter.getLives(target.getPlayer()) <= 0) {
+                            target.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
+                        }
                     }
                     break;
                 case "remove":
@@ -148,8 +154,11 @@ public class MainCommand implements CommandExecutor {
                             .replace("{player}", target.getName()));
                     target.sendMessage(plugin.getLang().getString("ADMIN-REMOVED")
                             .replace("{lifes}", String.valueOf(value)));
-                    if (counter.getLives(target.getPlayer()) <= 0) {
-                        target.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
+
+                    if (plugin.getCfg().getBoolean("CUSTOM-BAN-ON-FINAL-DEATH")) {
+                        if (counter.getLives(target.getPlayer()) <= 0) {
+                            target.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
+                        }
                     }
                     break;
                 case "reload":

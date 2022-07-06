@@ -1,3 +1,12 @@
 DEFAULT-LIVES: 3
 RESPAWN-TIME: 5
 RESPAWN-GAMEMODE: survival
+CUSTOM-BAN-ON-FINAL-DEATH: true
+ACTIONS-ON-DEATH:
+  - '[PLAYER] say im dead :('
+  - '[CONSOLE] broadcast {player} lost a life!'
+  - '[MESSAGE] You lost a life! Take care of the next...'
+ACTIONS-ON-FINAL-DEATH:
+  - '[PLAYER] say i lost the final life! :sob:'
+  - '[CONSOLE] broadcast {player} dies FOR EVER!'
+  - '[CONSOLE] ban {player} GOOD BYE BABY!'

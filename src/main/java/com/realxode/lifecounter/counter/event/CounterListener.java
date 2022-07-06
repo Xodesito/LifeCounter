@@ -16,6 +16,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.time.LocalDateTime;
 import java.util.logging.Level;
 
 import static com.realxode.api.chat.ChatUtil.Chat.centerMessage;
@@ -24,10 +25,12 @@ import static com.realxode.api.chat.ChatUtil.translate;
 
 public class CounterListener implements Listener {
     private final LifeCounter plugin;
+    LocalDateTime date;
 
     public CounterListener(LifeCounter plugin) {
         this.plugin = plugin;
     }
+
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
@@ -37,16 +40,18 @@ public class CounterListener implements Listener {
             this.plugin.getLogger().log(Level.INFO, plugin.getLang().getString("CONSOLE-LOG-ON-JOIN").replace("{player}", player.getName()));
         }
 
-        if (this.plugin.getCounter().getLives(player) == 0) {
-            player.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
-        } else {
-            (new BukkitRunnable() {
-                public void run() {
-                    String message = plugin.getLang().getString("ACTION-BAR").replace("{lifes}",
-                            String.valueOf(plugin.getCounter().getLives(player)));
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
-                }
-            }).runTaskTimer(plugin, 20L, 20L);
+        if (plugin.getCfg().getBoolean("CUSTOM-BAN-ON-FINAL-DEATH")) {
+            if (this.plugin.getCounter().getLives(player) == 0) {
+                player.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
+            } else {
+                (new BukkitRunnable() {
+                    public void run() {
+                        String message = plugin.getLang().getString("ACTION-BAR").replace("{lifes}",
+                                String.valueOf(plugin.getCounter().getLives(player)));
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
+                    }
+                }).runTaskTimer(plugin, 20L, 20L);
+            }
         }
         if (player.getWorld().getGameRuleValue(GameRule.DO_IMMEDIATE_RESPAWN)) return;
         player.getWorld().setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
@@ -55,34 +60,52 @@ public class CounterListener implements Listener {
     @EventHandler
     public void onPlayerDie(PlayerDeathEvent e) {
         final Player player = e.getEntity();
+
         (new BukkitRunnable() {
             public void run() {
                 player.spigot().respawn();
             }
         }).runTaskLater(plugin, 1L);
         if (plugin.getCounter().isInConfig(player)) {
-            if (plugin.getCounter().getLives(player) - 1 == 0) {
-                player.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
-                plugin.getCounter().setLives(player, 0);
+            String broadcastMessage = plugin.getLang().getString("BROADCAST-DEATH-MESSAGE")
+                    .replace("{player}", player.getName())
+                    .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(player) - 1));
+            if (broadcastMessage.contains("<#center>")) {
+                e.setDeathMessage(centerMessage(broadcastMessage
+                        .replace("<#center>", "")));
             } else {
-                plugin.getCounter().setLives(player, plugin.getCounter().getLives(player) - 1);
-                for (String string : plugin.getLang().getStringList("DEATH-MESSAGE")) {
-                    if (string.contains("<#center>")) {
-                        sendCenteredMessageV2(player, string
-                                .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(player)))
-                                .replace("<#center>", ""));
-                    } else {
-                        player.sendMessage(translate(string.replace("{lifes}", String.valueOf(plugin.getCounter().getLives(player)))));
+                e.setDeathMessage(broadcastMessage);
+            }
+            if (plugin.getCfg().getBoolean("CUSTOM-BAN-ON-FINAL-DEATH")) {
+                if (plugin.getCounter().getLives(player) - 1 == 0) {
+                    player.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
+                    plugin.getCounter().setLives(player, 0);
+                    return;
+                }
+            }
+            plugin.getCounter().setLives(player, plugin.getCounter().getLives(player) - 1);
+            if (plugin.getCfg().getStringList("ACTIONS-ON-DEATH") != null) {
+                for (String command : plugin.getCfg().getStringList("ACTIONS-ON-DEATH")) {
+                    runActions(player, command);
+                }
+            } else {
+                return;
+            }
+
+            if (plugin.getCfg().getStringList("ACTIONS-ON-FINAL-DEATH") != null) {
+                if (plugin.getCounter().getLives(player) == 0) {
+                    for (String command : plugin.getCfg().getStringList("ACTIONS-ON-FINAL-DEATH")) {
+                        runActions(player, command);
                     }
                 }
-                String broadcastMessage = plugin.getLang().getString("BROADCAST-DEATH-MESSAGE")
-                        .replace("{player}", player.getName())
-                        .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(player)));
-                if (broadcastMessage.contains("<#center>")) {
-                    e.setDeathMessage(centerMessage(broadcastMessage
-                            .replace("<#center>", "")));
+            }
+            for (String string : plugin.getLang().getStringList("DEATH-MESSAGE")) {
+                if (string.contains("<#center>")) {
+                    sendCenteredMessageV2(player, string
+                            .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(player)))
+                            .replace("<#center>", ""));
                 } else {
-                    e.setDeathMessage(broadcastMessage);
+                    player.sendMessage(translate(string.replace("{lifes}", String.valueOf(plugin.getCounter().getLives(player)))));
                 }
             }
         }
@@ -117,4 +140,34 @@ public class CounterListener implements Listener {
             }
         }).runTaskTimer(this.plugin, 1L, 20L);
     }
+
+
+    // METHODS
+
+    private void runActions(Player player, String command) {
+        if (command.contains("[PLAYER] ")) {
+            player.performCommand(command
+                    .replace("[PLAYER] ", "")
+                    .replace("{player}", player.getName())
+                    .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(player))));
+        } else if (command.contains("[CONSOLE] ")) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
+                    .replace("[CONSOLE] ", "")
+                    .replace("{player}", player.getName())
+                    .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(player))));
+        } else if (command.contains("[MESSAGE] ")) {
+            if (command.contains("<#center>")) {
+                sendCenteredMessageV2(player, command
+                        .replace("[MESSAGE] ", "")
+                        .replace("{player}", player.getName())
+                        .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(player))));
+            } else {
+                player.sendMessage(translate(command
+                        .replace("[MESSAGE] ", "")
+                        .replace("{player}", player.getName())
+                        .replace("{lifes}", String.valueOf(plugin.getCounter().getLives(player)))));
+            }
+        }
+    }
+
 }
