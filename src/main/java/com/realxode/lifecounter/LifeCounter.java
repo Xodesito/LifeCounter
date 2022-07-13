@@ -7,6 +7,7 @@ import com.realxode.lifecounter.counter.command.MainTab;
 import com.realxode.lifecounter.counter.command.ReliveCommand;
 import com.realxode.lifecounter.counter.event.CounterListener;
 import com.realxode.lifecounter.counter.utils.Cooldown;
+import com.realxode.lifecounter.papi.LifeCounterExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -50,6 +51,11 @@ public final class LifeCounter extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage(translate("&d[LifeCounter] &fIf you need any kind of support, " +
                 "don't hesitate to enter our Support Discord and ask anything! You will be welcome."));
         Bukkit.getConsoleSender().sendMessage(translate("&d[LifeCounter] &fSupport Discord: &b&nhttps://discord.gg/BD5TdFsgXa"));
+        // PlaceholderAPI
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            LifeCounterExpansion lifeCounterExpansion = new LifeCounterExpansion();
+            lifeCounterExpansion.register();
+        }
     }
 
     public void onDisable() {
