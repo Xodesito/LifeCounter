@@ -11,37 +11,66 @@ import java.util.List;
 
 public class MainTab implements TabCompleter {
 
+    private final List<String> firstCommands = new ArrayList<>();
+
+    public MainTab() {
+        firstCommands.add("set");
+        firstCommands.add("add");
+        firstCommands.add("remove");
+        firstCommands.add("reload");
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-
         List<String> results = new ArrayList<>();
-        if (args.length == 1) {
-            results.add("set");
-            results.add("add");
-            results.add("remove");
-            results.add("reload");
-        } else if (args.length == 2) {
-            if (args[0].equalsIgnoreCase("set")
-                    || args[0].equalsIgnoreCase("add")
-                    || args[0].equalsIgnoreCase("remove")) {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    results.add(player.getName());
+        switch (args.length) {
+            case 1: {
+                String first = args[0];
+                if (!first.equals("")) {
+                    for (String firstCommand:firstCommands) {
+                        if (firstCommand.startsWith(first)) {
+                            results.add(firstCommand);
+                        }
+                    }
                 }
             }
-        } else if (args.length == 3) {
-            if (args[0].equalsIgnoreCase("set")
-                    || args[0].equalsIgnoreCase("add")
-                    || args[0].equalsIgnoreCase("remove")) {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (!args[1].equalsIgnoreCase(player.getName())) {
-                        results.add("Invalid player!");
-                    } else {
-                        results.add("<value>");
+            case 2: {
+                String subCommand = args[0];
+                switch (subCommand.toLowerCase()) {
+                    case "set":
+                    case "add":
+                    case "remove": {
+                        String inputName = args[1];
+                        for (Player player : Bukkit.getOnlinePlayers()) {
+                            String name = player.getName();
+                            if (inputName.equals("")) {
+                                results.add(name);
+                            } else {
+                                if (name.startsWith(inputName)) {
+                                    results.add(name);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            case 3: {
+                String subCommand = args[0];
+                switch (subCommand.toLowerCase()) {
+                    case "set":
+                    case "add":
+                    case "remove": {
+                        Player player = Bukkit.getPlayerExact(args[1]);
+                        if (player != null) {
+                            results.add("<value>");
+                        } else {
+                            results.add("Invalid player!");
+                        }
                     }
                 }
             }
         }
-
         return results;
     }
+
 }
