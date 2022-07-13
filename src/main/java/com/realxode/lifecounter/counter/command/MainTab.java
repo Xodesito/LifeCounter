@@ -33,6 +33,7 @@ public class MainTab implements TabCompleter {
                         }
                     }
                 }
+                break;
             }
             case 2: {
                 String subCommand = args[0];
@@ -53,6 +54,7 @@ public class MainTab implements TabCompleter {
                         }
                     }
                 }
+                break;
             }
             case 3: {
                 String subCommand = args[0];
