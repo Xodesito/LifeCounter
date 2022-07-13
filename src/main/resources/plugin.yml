@@ -12,3 +12,5 @@ commands:
       - lc
       - life
       - vida
+  relive:
+    description: Get other life

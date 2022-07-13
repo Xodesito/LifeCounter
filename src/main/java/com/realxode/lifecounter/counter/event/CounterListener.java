@@ -1,6 +1,7 @@
 package com.realxode.lifecounter.counter.event;
 
 import com.realxode.lifecounter.LifeCounter;
+import com.realxode.lifecounter.counter.utils.Cooldown;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -16,7 +17,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import static com.realxode.api.chat.ChatUtil.Chat.centerMessage;
@@ -25,10 +29,11 @@ import static com.realxode.api.chat.ChatUtil.translate;
 
 public class CounterListener implements Listener {
     private final LifeCounter plugin;
-    LocalDateTime date;
+    private final List<UUID> isInCooldown;
 
     public CounterListener(LifeCounter plugin) {
         this.plugin = plugin;
+        isInCooldown = new ArrayList<>();
     }
 
 
@@ -43,15 +48,17 @@ public class CounterListener implements Listener {
         if (plugin.getCfg().getBoolean("CUSTOM-BAN-ON-FINAL-DEATH")) {
             if (this.plugin.getCounter().getLives(player) == 0) {
                 player.kickPlayer(plugin.getLang().getString("KICK-MESSAGE"));
-            } else {
-                (new BukkitRunnable() {
-                    public void run() {
+            }
+        } else {
+            (new BukkitRunnable() {
+                public void run() {
+                    if (!isInCooldown.contains(player.getUniqueId())) {
                         String message = plugin.getLang().getString("ACTION-BAR").replace("{lifes}",
                                 String.valueOf(plugin.getCounter().getLives(player)));
                         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
                     }
-                }).runTaskTimer(plugin, 20L, 20L);
-            }
+                }
+            }).runTaskTimer(plugin, 20L, 20L);
         }
         if (player.getWorld().getGameRuleValue(GameRule.DO_IMMEDIATE_RESPAWN)) return;
         player.getWorld().setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
@@ -115,6 +122,38 @@ public class CounterListener implements Listener {
     public void onRespawn(PlayerRespawnEvent e) {
         final Player player = e.getPlayer();
         player.setGameMode(GameMode.SPECTATOR);
+        if (plugin.getCounter().getLives(player) <= 0) {
+            Cooldown cooldown = plugin.getCooldown();
+            cooldown.setPlayerLiveInCooldown(player);
+            isInCooldown.add(player.getUniqueId());
+            (new BukkitRunnable() {
+                @Override
+                public void run() {
+                    cooldown.setAfter(Instant.now());
+                    cooldown.setMilli(cooldown.getBefore().toEpochMilli() - cooldown.getAfter().toEpochMilli());
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(translate(plugin.getLang().getString("COOLDOWN-ACTIONBAR").replace("%time%",
+                            cooldown.getDynamicFormattedTime(cooldown.getMilli(),
+                                    "%days%d, ", "%hours%h, ", "%minutes%m, ", "%seconds%s")))));
+                    if (cooldown.getAfter().isAfter(cooldown.getBefore())) {
+                        player.sendTitle(translate(plugin.getLang().getString("COOLDOWN-ENDED.title")), translate(plugin.getLang().getString("COOLDOWN-ENDED.subtitle"))
+                                , 20, 120 * 20, 20);
+                        isInCooldown.remove(player.getUniqueId());
+                        cooldown.setPlayerLiveCanRelive(player);
+                        cancel();
+                    }
+                }
+            }).runTaskTimer(plugin, 1L, 20L);
+            for (String line : plugin.getLang().getStringList("STARTING-COOLDOWN")) {
+                if (line.contains("<#center>")) {
+                    sendCenteredMessageV2(player, line.replace("<#center>", "").replace("{cooldown}", cooldown.getDynamicFormattedTime(cooldown.getMilli(),
+                            "%days%d, ", "%hours%h, ", "%minutes%m, ", "%seconds%s")));
+                } else {
+                    player.sendMessage(translate(line.replace("{cooldown}", cooldown.getDynamicFormattedTime(cooldown.getMilli(),
+                            "%days%d, ", "%hours%h, ", "%minutes%m, ", "%seconds%s"))));
+                }
+            }
+            return;
+        }
         (new BukkitRunnable() {
             int time = (plugin.getCfg().getInt("RESPAWN-TIME") + 1);
 

@@ -6,12 +6,12 @@
 
     <groupId>com.realxode</groupId>
     <artifactId>LifeCounter</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>LifeCounter</name>
 
-    <description>Count your lifes</description>
+    <description>Count your lives</description>
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

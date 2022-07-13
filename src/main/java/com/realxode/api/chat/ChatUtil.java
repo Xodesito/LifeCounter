@@ -1,11 +1,12 @@
 package com.realxode.api.chat;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ChatUtil {
     private static final int CENTER_PX = 154;
@@ -19,7 +20,7 @@ public class ChatUtil {
     }
 
     public static List<String> translate(List<String> in) {
-        return (List)in.stream().map(ChatUtil::translate).collect(Collectors.toList());
+        return in.stream().map(ChatUtil::translate).collect(Collectors.toList());
     }
 
     public static String strip(String in) {
@@ -42,7 +43,7 @@ public class ChatUtil {
         Bukkit.getConsoleSender().sendMessage(translate(in));
     }
 
-    public static enum Chat {
+    public enum Chat {
         A('A', 5),
         a('a', 5),
         B('B', 5),
@@ -147,7 +148,7 @@ public class ChatUtil {
         private static final int CENTER_CHAT_PX = 154;
         private static final int MAX_CHAT_PX = 250;
 
-        private Chat(char character, int length) {
+        Chat(char character, int length) {
             this.character = character;
             this.length = length;
         }
@@ -168,7 +169,7 @@ public class ChatUtil {
             Chat[] var1 = values();
             int var2 = var1.length;
 
-            for(int var3 = 0; var3 < var2; ++var3) {
+            for (int var3 = 0; var3 < var2; ++var3) {
                 Chat dFI = var1[var3];
                 if (dFI.getCharacter() == c) {
                     return dFI;
@@ -179,7 +180,7 @@ public class ChatUtil {
         }
 
         public static String centerMotD(String message) {
-            message = ChatColor.translateAlternateColorCodes('&', message);
+            message = ChatColor.translateAlternateColorCodes('&', message.replace("<#center>", ""));
             int messagePxSize = 0;
             boolean previousCode = false;
             boolean isBold = false;
@@ -192,7 +193,7 @@ public class ChatUtil {
 
             int spaceLength;
             int c;
-            for(spaceLength = 0; spaceLength < toCompensate; ++spaceLength) {
+            for (spaceLength = 0; spaceLength < toCompensate; ++spaceLength) {
                 c = var8[spaceLength];
                 if (c == 167) {
                     previousCode = true;
@@ -209,7 +210,7 @@ public class ChatUtil {
                     } else if (c == 32) {
                         lastSpaceIndex = charIndex;
                     } else {
-                        Chat dFI = getDefaultFontInfo((char)c);
+                        Chat dFI = getDefaultFontInfo((char) c);
                         messagePxSize += isBold ? dFI.getBoldLength() : dFI.getLength();
                         ++messagePxSize;
                     }
@@ -230,7 +231,7 @@ public class ChatUtil {
             c = 0;
 
             StringBuilder sb;
-            for(sb = new StringBuilder(); c < toCompensate; c += spaceLength) {
+            for (sb = new StringBuilder(); c < toCompensate; c += spaceLength) {
                 sb.append(" ");
             }
 
@@ -246,7 +247,7 @@ public class ChatUtil {
                 player.sendMessage("");
             }
 
-            message = ChatColor.translateAlternateColorCodes('&', message);
+            message = ChatColor.translateAlternateColorCodes('&', message.replace("<#center>", ""));
             int messagePxSize = 0;
             boolean previousCode = false;
             boolean isBold = false;
@@ -255,19 +256,15 @@ public class ChatUtil {
 
             int spaceLength;
             int c;
-            for(spaceLength = 0; spaceLength < toCompensate; ++spaceLength) {
+            for (spaceLength = 0; spaceLength < toCompensate; ++spaceLength) {
                 c = var5[spaceLength];
                 if (c == 167) {
                     previousCode = true;
                 } else if (previousCode) {
                     previousCode = false;
-                    if (c != 108 && c != 76) {
-                        isBold = false;
-                    } else {
-                        isBold = true;
-                    }
+                    isBold = c == 108 || c == 76;
                 } else {
-                    Chat dFI = getDefaultFontInfo((char)c);
+                    Chat dFI = getDefaultFontInfo((char) c);
                     messagePxSize += isBold ? dFI.getBoldLength() : dFI.getLength();
                     ++messagePxSize;
                 }
@@ -279,7 +276,7 @@ public class ChatUtil {
             c = 0;
 
             StringBuilder sb;
-            for(sb = new StringBuilder(); c < toCompensate; c += spaceLength) {
+            for (sb = new StringBuilder(); c < toCompensate; c += spaceLength) {
                 sb.append(" ");
             }
 
@@ -287,7 +284,7 @@ public class ChatUtil {
         }
 
         public static void sendCenteredMessageV2(Player player, String message) {
-            message = ChatColor.translateAlternateColorCodes('&', message);
+            message = ChatColor.translateAlternateColorCodes('&', message.replace("<#center>", ""));
             int messagePxSize = 0;
             boolean previousCode = false;
             boolean isBold = false;
@@ -300,7 +297,7 @@ public class ChatUtil {
 
             int spaceLength;
             int c;
-            for(spaceLength = 0; spaceLength < toCompensate; ++spaceLength) {
+            for (spaceLength = 0; spaceLength < toCompensate; ++spaceLength) {
                 c = var9[spaceLength];
                 if (c == 167) {
                     previousCode = true;
@@ -317,7 +314,7 @@ public class ChatUtil {
                     } else if (c == 32) {
                         lastSpaceIndex = charIndex;
                     } else {
-                        Chat dFI = getDefaultFontInfo((char)c);
+                        Chat dFI = getDefaultFontInfo((char) c);
                         messagePxSize += isBold ? dFI.getBoldLength() : dFI.getLength();
                         ++messagePxSize;
                     }
@@ -338,7 +335,7 @@ public class ChatUtil {
             c = 0;
 
             StringBuilder sb;
-            for(sb = new StringBuilder(); c < toCompensate; c += spaceLength) {
+            for (sb = new StringBuilder(); c < toCompensate; c += spaceLength) {
                 sb.append(" ");
             }
 
@@ -350,7 +347,7 @@ public class ChatUtil {
         }
 
         public static void sendCenteredMessageV2(CommandSender player, String message) {
-            message = ChatColor.translateAlternateColorCodes('&', message);
+            message = ChatColor.translateAlternateColorCodes('&', message.replace("<#center>", ""));
             int messagePxSize = 0;
             boolean previousCode = false;
             boolean isBold = false;
@@ -363,7 +360,7 @@ public class ChatUtil {
 
             int spaceLength;
             int c;
-            for(spaceLength = 0; spaceLength < toCompensate; ++spaceLength) {
+            for (spaceLength = 0; spaceLength < toCompensate; ++spaceLength) {
                 c = var9[spaceLength];
                 if (c == 167) {
                     previousCode = true;
@@ -380,7 +377,7 @@ public class ChatUtil {
                     } else if (c == 32) {
                         lastSpaceIndex = charIndex;
                     } else {
-                        Chat dFI = getDefaultFontInfo((char)c);
+                        Chat dFI = getDefaultFontInfo((char) c);
                         messagePxSize += isBold ? dFI.getBoldLength() : dFI.getLength();
                         ++messagePxSize;
                     }
@@ -401,7 +398,7 @@ public class ChatUtil {
             c = 0;
 
             StringBuilder sb;
-            for(sb = new StringBuilder(); c < toCompensate; c += spaceLength) {
+            for (sb = new StringBuilder(); c < toCompensate; c += spaceLength) {
                 sb.append(" ");
             }
 
@@ -413,7 +410,7 @@ public class ChatUtil {
         }
 
         public static String centerMessage(String message) {
-            message = ChatColor.translateAlternateColorCodes('&', message);
+            message = ChatColor.translateAlternateColorCodes('&', message.replace("<#center>", ""));
             int messagePxSize = 0;
             boolean previousCode = false;
             boolean isBold = false;
@@ -426,7 +423,7 @@ public class ChatUtil {
 
             int spaceLength;
             int c;
-            for(spaceLength = 0; spaceLength < toCompensate; ++spaceLength) {
+            for (spaceLength = 0; spaceLength < toCompensate; ++spaceLength) {
                 c = var8[spaceLength];
                 if (c == 167) {
                     previousCode = true;
@@ -443,7 +440,7 @@ public class ChatUtil {
                     } else if (c == 32) {
                         lastSpaceIndex = charIndex;
                     } else {
-                        Chat dFI = getDefaultFontInfo((char)c);
+                        Chat dFI = getDefaultFontInfo((char) c);
                         messagePxSize += isBold ? dFI.getBoldLength() : dFI.getLength();
                         ++messagePxSize;
                     }
@@ -464,7 +461,7 @@ public class ChatUtil {
             c = 0;
 
             StringBuilder sb;
-            for(sb = new StringBuilder(); c < toCompensate; c += spaceLength) {
+            for (sb = new StringBuilder(); c < toCompensate; c += spaceLength) {
                 sb.append(" ");
             }
 
