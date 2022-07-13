@@ -4,6 +4,7 @@ main: com.realxode.lifecounter.LifeCounter
 api-version: 1.18
 authors: [ RealXode ]
 description: Count your lifes
+softdepend: [ PlaceholderAPI ]
 commands:
   lifecounter:
     description: LifeCounter main command
